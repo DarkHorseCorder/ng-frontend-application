@@ -1,11 +1,10 @@
 import Head from 'next/head';
 import Image from 'next/image';
-import Link from 'next/link';
 import { QueryClient, QueryClientProvider, useQuery } from 'react-query';
 
 const queryClient = new QueryClient();
-const myLoader = ({ src, width, quality }: { src: string; width: number; quality?: number | undefined }) => {
-	return `${src}?w=${width}&q=${quality || 75}`;
+const myLoader = ({ src, width }: { src: string; width: number }) => {
+	return `${src}`;
 };
 interface Cardprops {
 	imagesrc: string;
@@ -18,6 +17,7 @@ interface Cardprops {
 	gold: number;
 }
 const Card = ({ imagesrc, title, skillTree, skill, type, difficulty, experience, gold }: Cardprops) => {
+	console.log(imagesrc);
 	return (
 		<div className='card'>
 			<Image
@@ -27,8 +27,7 @@ const Card = ({ imagesrc, title, skillTree, skill, type, difficulty, experience,
 				alt='cardImage'
 				width='0'
 				height='0'
-				style={{ width: '100%', height: 'auto', minWidth: '100px', maxHeight: '250px' }}
-				priority
+				style={{ width: 'auto', height: 'auto', minWidth: '100px', maxHeight: '150px' }}
 			/>
 			<div className='cardTitle'>{title.toUpperCase()}</div>
 			<div className='cardInfo'>
@@ -72,33 +71,27 @@ const Card = ({ imagesrc, title, skillTree, skill, type, difficulty, experience,
 const CardContainer = () => {
 	const { isLoading, error, data } = useQuery('repoData', () => fetch('/api/quests').then((res) => res.json()));
 
-	if (isLoading)
-		return (
-			<div className='container'>
-				<div className='loader'></div>
-			</div>
-		);
+	if (isLoading) return <p>'Loading...'</p>;
 
 	if (error) return <p>'An error has occurred: '</p>;
 
 	if (data.length > 0) {
+		console.log(data);
 		return (
 			<div className='container'>
 				<div className='card_container'>
 					{data.map((cardData: any) => {
 						return (
-							<Link href={`/quest/${cardData.id}`} key={cardData.id} style={{ textDecoration: 'none' }}>
-								<Card
-									imagesrc={cardData.cover}
-									title={cardData.title}
-									skillTree={cardData.skillTree}
-									skill={cardData.skill}
-									type={cardData.type}
-									difficulty={cardData.difficulty}
-									experience={cardData.experience}
-									gold={cardData.gold}
-								/>
-							</Link>
+							<Card
+								imagesrc={cardData.cover}
+								title={cardData.title}
+								skillTree={cardData.skillTree}
+								skill={cardData.skill}
+								type={cardData.type}
+								difficulty={cardData.difficulty}
+								experience={cardData.experience}
+								gold={cardData.gold}
+							/>
 						);
 					})}
 				</div>
@@ -116,7 +109,7 @@ export default function Home() {
 			</Head>
 
 			<main>
-				<Image src={'/NG logo.png'} alt='logo' width={320} height={35} className='applogo' priority />
+				<Image src={'/NG logo.png'} alt='logo' width={320} height={35} className='applogo' />
 				<QueryClientProvider client={queryClient}>
 					<CardContainer />
 				</QueryClientProvider>

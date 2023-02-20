@@ -3,20 +3,16 @@ import { NextApiRequest, NextApiResponse } from 'next';
 export default async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 	try {
 		// Save the data to the collection
-		const getRes = await fetch(`https://dummyjson.com/products?offset=0&limit=10`, {
+		const response = await fetch(`https://dummyjson.com/products?offset=0&limit=10`, {
 			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json'
 			}
-		})
-			.then((response) => response.json())
-			.then((data) => data.products);
+		});
 
-		if (getRes.code) {
-			throw new Error('An error occurred while fetching the data');
-		}
+		const getRes = await response.json();
 
-		const formattedToQuests = getRes.map((quest: any) => {
+		const formattedToQuests = getRes.products.map((quest: any) => {
 			return {
 				id: quest.id,
 				skillTree: quest.category.replace('-', ' '), // 'home-decoration' => 'home decoration'
